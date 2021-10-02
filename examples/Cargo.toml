@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "examples"
+publish = false
+version = "0.0.0"
+
+[dev-dependencies]
+mio_runtime = {path = "../mio_runtime"}
+tokio = { version = "1.*", features = ["io-util"] }
+futures = "0.3"
+
+[[example]]
+name = "echo"
+path = "echo.rs"
+

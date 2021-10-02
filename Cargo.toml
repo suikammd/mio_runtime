@@ -1,0 +1,17 @@
+[package]
+name = "mio_runtime"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+mio = { version = "0.7", features = ["os-poll", "os-ext"]}
+futures = "0.3"
+scoped-tls = "1.*"
+rustc-hash = "1.*"
+pin-utils = "*"
+waker-fn = "1.*"
+tokio = { version = "1.*", features = ["io-util"] }
+socket2 = "*"
+nix = "*"
