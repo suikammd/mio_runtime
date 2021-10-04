@@ -6,7 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mio = { version = "0.7", features = ["os-poll", "os-ext"]}
+mio = { version = "0.7", features = ["os-poll", "os-ext", "net"]}
 futures = "0.3"
 scoped-tls = "1.*"
 rustc-hash = "1.*"

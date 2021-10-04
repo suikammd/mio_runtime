@@ -15,7 +15,7 @@ use crate::{executor::get_reactor, reactor::Reactor};
 
 pub struct TcpListener {
     reactor: Weak<RefCell<Reactor>>,
-    listener: std::net::TcpListener,
+    listener: mio::net::TcpListener,
 }
 
 impl TcpListener {
@@ -42,7 +42,7 @@ impl TcpListener {
         println!("tcp bind with fd {}", sk.as_raw_fd());
         Ok(Self {
             reactor: Rc::downgrade(&reactor),
-            listener: sk.into(),
+            listener: mio::net::TcpListener::from_std(sk.into()),
         })
     }
 }
@@ -78,11 +78,11 @@ impl Stream for TcpListener {
 
 #[derive(Debug)]
 pub struct TcpStream {
-    inner: std::net::TcpStream,
+    inner: mio::net::TcpStream,
 }
 
-impl From<std::net::TcpStream> for TcpStream {
-    fn from(stream: std::net::TcpStream) -> Self {
+impl From<mio::net::TcpStream> for TcpStream {
+    fn from(stream: mio::net::TcpStream) -> Self {
         let reactor = get_reactor();
         reactor.borrow_mut().add(stream.as_raw_fd());
         Self { inner: stream }
@@ -113,7 +113,7 @@ impl AsyncRead for TcpStream {
                     buf.assume_init(n);
                     buf.advance(n);
                     Poll::Ready(Ok(()))
-                },
+                }
                 Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                     println!("[TcpStream] AsyncRead meet error WouldBlock");
                     let reactor = get_reactor();
