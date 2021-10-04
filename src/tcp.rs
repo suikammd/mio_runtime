@@ -25,24 +25,25 @@ impl TcpListener {
             .next()
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::Other, "empty address"))?;
 
-        let domain = if addr.is_ipv6() {
-            Domain::IPV6
+        let sk = if addr.is_ipv6() {
+            mio::net::TcpSocket::new_v6().unwrap()
         } else {
-            Domain::IPV4
+            mio::net::TcpSocket::new_v4().unwrap()
         };
-        let sk = Socket::new(domain, Type::STREAM, Some(Protocol::TCP))?;
-        let addr = socket2::SockAddr::from(addr);
-        sk.set_reuse_address(true)?;
-        sk.bind(&addr)?;
-        sk.listen(1024)?;
+
+        sk.bind(addr)?;
+        sk.set_reuseaddr(true)?;
 
         // add fd to reactor
         let reactor = get_reactor();
         reactor.borrow_mut().add(sk.as_raw_fd());
         println!("tcp bind with fd {}", sk.as_raw_fd());
+
+        let listener = sk.listen(1024)?;
+
         Ok(Self {
             reactor: Rc::downgrade(&reactor),
-            listener: mio::net::TcpListener::from_std(sk.into()),
+            listener,
         })
     }
 }
